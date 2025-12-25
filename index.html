@@ -1152,7 +1152,7 @@
     refreshBtn.textContent = "Refreshing…";
 
     try {
-      const url = `https://queue-times.com/parks/${QUEUE_TIMES_PARK_ID}/queue_times.json`;
+     const url = `https://cors.isomorphic-git.org/https://queue-times.com/parks/${QUEUE_TIMES_PARK_ID}/queue_times.json`;
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
