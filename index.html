@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disney California Adventure Day Planner</title>
+    <style>
+        /* CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Disney-inspired color scheme */
+            --primary-blue: #0063B2;
+            --primary-purple: #6B4C9A;
+            --accent-gold: #FFD700;
+            --bg-light: #F5F7FA;
+            --bg-white: #FFFFFF;
+            --text-dark: #1A1A1A;
+            --text-gray: #666666;
+            --border-light: #E0E0E0;
+            --success-green: #28A745;
+            --warning-yellow: #FFC107;
+            --danger-red: #DC3545;
+            --closed-gray: #9E9E9E;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+        }
+
+        /* Main Layout Container */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-white);
+            border-right: 1px solid var(--border-light);
+            padding: 20px;
+            overflow-y: auto;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-section {
+            margin-bottom: 24px;
+        }
+
+        .sidebar-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 12px;
+        }
+
+        /* Progress Card */
+        .progress-card {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-purple));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+
+        .progress-card h1 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .progress-text {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.3);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: var(--accent-gold);
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        /* Checklist Section */
+        .checklist {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-light);
+            cursor: pointer;
+            min-height: 44px;
+        }
+
+        .checklist-item:hover {
+            background: var(--bg-light);
+        }
+
+        .checklist-checkbox {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            border: 2px solid var(--primary-blue);
+            border-radius: 4px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .checklist-checkbox.checked {
+            background: var(--primary-blue);
+        }
+
+        .checklist-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .checklist-name {
+            flex: 1;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .checklist-item.completed .checklist-name {
+            text-decoration: line-through;
+            color: var(--text-gray);
+        }
+
+        .checklist-wait {
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        /* Park Map Overview */
+        .park-map {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .land-summary {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .land-summary-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .land-summary-stats {
+            font-size: 12px;
+            color: var(--text-gray);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Suggested Rides */
+        .suggested-rides {
+            list-style: none;
+        }
+
+        .suggested-ride {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 4px solid var(--accent-gold);
+        }
+
+        .suggested-ride-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .suggested-ride-info {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 20px;
+        }
+
+        .header {
+            margin-bottom: 24px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .last-updated {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .reset-btn {
+            background: var(--danger-red);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .reset-btn:hover {
+            background: #C82333;
+        }
+
+        /* Filter Chips */
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .filter-chip {
+            background: var(--bg-white);
+            border: 2px solid var(--border-light);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--primary-blue);
+        }
+
+        .filter-chip.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding: 16px;
+            background: var(--bg-white);
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .legend-dot.green {
+            background: var(--success-green);
+        }
+
+        .legend-dot.yellow {
+            background: var(--warning-yellow);
+        }
+
+        .legend-dot.red {
+            background: var(--danger-red);
+        }
+
+        .legend-dot.gray {
+            background: var(--closed-gray);
+        }
+
+        /* Ride Cards Grid */
+        .rides-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .ride-card {
+            background: var(--bg-white);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            min-height: 44px;
+        }
+
+        .ride-card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .ride-card.completed {
+            border-color: var(--success-green);
+            opacity: 0.7;
+        }
+
+        .ride-card.headliner {
+            border-top: 4px solid var(--accent-gold);
+        }
+
+        .ride-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .ride-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            flex: 1;
+        }
+
+        .ride-card.completed .ride-name {
+            text-decoration: line-through;
+        }
+
+        .headliner-badge {
+            background: var(--accent-gold);
+            color: var(--text-dark);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .ride-land {
+            font-size: 14px;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+        }
+
+        .ride-wait {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .wait-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .wait-dot.green {
+            background: var(--success-green);
+        }
+
+        .wait-dot.yellow {
+            background: var(--warning-yellow);
+        }
+
+        .wait-dot.red {
+            background: var(--danger-red);
+        }
+
+        .wait-dot.gray {
+            background: var(--closed-gray);
+        }
+
+        .ride-notes {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.4;
+        }
+
+        /* Error Message */
+        .error-message {
+            background: #FFF3CD;
+            border: 1px solid #FFC107;
+            color: #856404;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        /* Modal/Dialog */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-white);
+            padding: 32px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            color: var(--text-gray);
+            margin-bottom: 24px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .modal-btn.cancel {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        .modal-btn.confirm {
+            background: var(--danger-red);
+            color: white;
+        }
+
+        .modal-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Tablet Styles (768px - 1023px) */
+        @media (max-width: 1023px) and (min-width: 768px) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main-content {
+                margin-left: 220px;
+            }
+
+            .rides-container {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        /* Mobile Styles (<768px) */
+        @media (max-width: 767px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: static;
+                width: 100%;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-light);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+            }
+
+            .rides-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .filter-chips {
+                justify-content: flex-start;
+            }
+
+            .legend {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .progress-card h1 {
+                font-size: 18px;
+            }
+
+            .progress-text {
+                font-size: 24px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--text-gray);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Progress Card -->
+            <div class="progress-card">
+                <h1>Day Planner</h1>
+                <div class="progress-text" id="progressText">0/16</div>
+                <div class="progress-bar-container">
+                    <div
+class="progress-bar"
+id="progressBar"
+style="width: 0%"
+></div>
+                </div>
+            </div>
+
+            <!-- Checklist Section -->
+            <div class="sidebar-section">
+                <h2>Checklist</h2>
+                <div class="checklist" id="checklist"></div>
+            </div>
+
+            <!-- Park Map Overview -->
+            <div class="sidebar-section">
+                <h2>Park Map</h2>
+                <div class="park-map" id="parkMap"></div>
+            </div>
+
+            <!-- Suggested Next Rides -->
+            <div class="sidebar-section">
+                <h2>Suggested Next</h2>
+                <ul class="suggested-rides" id="suggestedRides"></ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <div class="header-top">
+                    <div class="last-updated" id="lastUpdated">Loading wait times...</div>
+                    <button class="reset-btn" id="resetBtn">Reset Progress</button>
+                </div>
+
+                <!-- Error Message (hidden by default) -->
+                <div
+class="error-message"
+id="errorMessage"
+style="display: none;"
+></div>
+
+                <!-- Filter Chips -->
+                <div class="filter-chips" id="filterChips"></div>
+
+                <!-- Legend -->
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot green"></div>
+                        <span>0-30 min</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot yellow"></div>
+                        <span>31-60 min</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot red"></div>
+                        <span>61+ min</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot gray"></div>
+                        <span>Closed</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rides Container -->
+            <div class="rides-container" id="ridesContainer"></div>
+        </main>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div class="modal" id="resetModal">
+        <div class="modal-content">
+            <div class="modal-title">Reset Progress?</div>
+            <div class="modal-text">This will clear all your completed rides. Are you sure you want to continue?</div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="cancelReset">Cancel</button>
+                <button class="modal-btn confirm" id="confirmReset">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hardcoded Attraction Data
+        const ATTRACTIONS = [
+            // Avengers Campus
+            {
+                id: 'guardians',
+                name: 'Guardians of the Galaxy – Mission: Breakout!',
+                land: 'Avengers Campus',
+                headliner: true,
+                priority: 1,
+                notes: 'Thrilling drop tower with randomized sequences and Marvel storytelling'
+            },
+            {
+                id: 'webslingers',
+                name: 'WEB SLINGERS: A Spider-Man Adventure',
+                land: 'Avengers Campus',
+                headliner: false,
+                priority: 2,
+                notes: 'Interactive 3D ride where you help Spider-Man capture Spider-Bots'
+            },
+            // Cars Land
+            {
+                id: 'radiator-springs',
+                name: 'Radiator Springs Racers',
+                land: 'Cars Land',
+                headliner: true,
+                priority: 1,
+                notes: 'High-speed racing adventure through the world of Cars'
+            },
+            {
+                id: 'maters-junkyard',
+                name: "Mater's Junkyard Jamboree",
+                land: 'Cars Land',
+                headliner: false,
+                priority: 3,
+                notes: 'Whimsical tractor square dancing with Mater'
+            },
+            {
+                id: 'luigis-roadsters',
+                name: "Luigi's Rollickin' Roadsters",
+                land: 'Cars Land',
+                headliner: false,
+                priority: 3,
+                notes: 'Dancing car ride with Italian flair and upbeat music'
+            },
+            // Pixar Pier
+            {
+                id: 'incredicoaster',
+                name: 'Incredicoaster',
+                land: 'Pixar Pier',
+                headliner: true,
+                priority: 2,
+                notes: 'High-speed roller coaster themed to The Incredibles'
+            },
+            {
+                id: 'toy-story-mania',
+                name: 'Toy Story Midway Mania!',
+                land: 'Pixar Pier',
+                headliner: true,
+                priority: 1,
+                notes: '4D interactive carnival game shooting gallery'
+            },
+            {
+                id: 'pixar-pal-a-round',
+                name: 'Pixar Pal-A-Round (Non-Swinging)',
+                land: 'Pixar Pier',
+                headliner: false,
+                priority: 4,
+                notes: 'Classic Ferris wheel with stunning views of the park'
+            },
+            {
+                id: 'inside-out',
+                name: 'Inside Out Emotional Whirlwind',
+                land: 'Pixar Pier',
+                headliner: false,
+                priority: 4,
+                notes: 'Colorful spinning ride featuring Riley\'s emotions'
+            },
+            // Paradise Gardens Park
+            {
+                id: 'little-mermaid',
+                name: 'The Little Mermaid ~ Ariel\'s Undersea Adventure',
+                land: 'Paradise Gardens Park',
+                headliner: false,
+                priority: 3,
+                notes: 'Dark ride journey through Ariel\'s underwater world'
+            },
+            {
+                id: 'goofys-sky-school',
+                name: "Goofy's Sky School",
+                land: 'Paradise Gardens Park',
+                headliner: false,
+                priority: 3,
+                notes: 'Wild roller coaster themed to Goofy\'s flight school'
+            },
+            {
+                id: 'silly-symphony',
+                name: 'Silly Symphony Swings',
+                land: 'Paradise Gardens Park',
+                headliner: false,
+                priority: 4,
+                notes: 'Classic swing ride with a musical twist'
+            },
+            // Grizzly Peak
+            {
+                id: 'soarin',
+                name: 'Soarin\' Around the World',
+                land: 'Grizzly Peak',
+                headliner: true,
+                priority: 1,
+                notes: 'Breathtaking hang gliding simulation over world landmarks'
+            },
+            {
+                id: 'grizzly-river',
+                name: 'Grizzly River Run',
+                land: 'Grizzly Peak',
+                headliner: true,
+                priority: 2,
+                notes: 'Whitewater rafting adventure through the Sierra Nevada'
+            },
+            // Hollywood Land
+            {
+                id: 'monsters-inc',
+                name: 'Monsters, Inc. Mike & Sulley to the Rescue!',
+                land: 'Hollywood Land',
+                headliner: false,
+                priority: 3,
+                notes: 'Dark ride through the world of Monsters, Inc.'
+            },
+            // Buena Vista Street
+            {
+                id: 'red-car-trolley',
+                name: 'Red Car Trolley',
+                land: 'Buena Vista Street',
+                headliner: false,
+                priority: 5,
+                notes: 'Scenic trolley ride through Buena Vista Street'
+            }
+        ];
+
+        // State Management
+        let completedRides = new Set();
+        let waitTimes = {};
+        let currentFilter = 'all';
+        let lastUpdateTime = null;
+
+        // Initialize app
+        function init() {
+            loadCompletedRides();
+            renderFilterChips();
+            renderRides();
+            renderChecklist();
+            renderParkMap();
+            renderSuggestedRides();
+            updateProgress();
+            fetchWaitTimes();
+            
+            // Auto-refresh every 5 minutes
+            setInterval(fetchWaitTimes, 5 * 60 * 1000);
+
+            // Event listeners
+            document.getElementById('resetBtn').addEventListener('click', showResetModal);
+            document.getElementById('cancelReset').addEventListener('click', hideResetModal);
+            document.getElementById('confirmReset').addEventListener('click', confirmReset);
+        }
+
+        // LocalStorage functions
+        function loadCompletedRides() {
+            const saved = localStorage.getItem('completedRides');
+            if (saved) {
+                completedRides = new Set(JSON.parse(saved));
+            }
+        }
+
+        function saveCompletedRides() {
+            localStorage.setItem('completedRides', JSON.stringify([...completedRides]));
+        }
+
+        // API Integration
+        async function fetchWaitTimes() {
+            try {
+                const response = await fetch('https://queue-times.com/parks/17/queue_times.json');
+                if (!response.ok) throw new Error('Failed to fetch');
+                
+                const data = await response.json();
+                waitTimes = {};
+                
+                // Match attractions by name (case-insensitive substring matching)
+                if (data.lands) {
+                    data.lands.forEach(land => {
+                        if (land.rides) {
+                            land.rides.forEach(ride => {
+                                const rideName = ride.name.toLowerCase();
+                                ATTRACTIONS.forEach(attraction => {
+                                    const attractionName = attraction.name.toLowerCase();
+                                    // Check if names match (substring or exact)
+                                    if (rideName.includes(attractionName) || attractionName.includes(rideName)) {
+                                        waitTimes[attraction.id] = {
+                                            wait: ride.wait_time || 0,
+                                            status: ride.is_open ? 'open' : 'closed'
+                                        };
+                                    }
+                                });
+                            });
+                        }
+                    });
+                }
+
+                lastUpdateTime = new Date();
+                hideError();
+                updateLastUpdatedText();
+                renderRides();
+                renderChecklist();
+                renderParkMap();
+                renderSuggestedRides();
+            } catch (error) {
+                console.error('Error fetching wait times:', error);
+                showError('Could not load live wait times. You can still use the checklist.');
+                updateLastUpdatedText();
+            }
+        }
+
+        function updateLastUpdatedText() {
+            const element = document.getElementById('lastUpdated');
+            if (lastUpdateTime) {
+                const timeStr = lastUpdateTime.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+                element.textContent = `Updated ${timeStr}`;
+            } else {
+                element.textContent = 'Wait times unavailable';
+            }
+        }
+
+        function showError(message) {
+            const errorElement = document.getElementById('errorMessage');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorMessage').style.display = 'none';
+        }
+
+        // Wait time display logic
+        function getWaitTimeDisplay(attractionId) {
+            const wait = waitTimes[attractionId];
+            if (!wait) return { text: 'N/A', color: 'gray' };
+            
+            if (wait.status === 'closed') {
+                return { text: 'Closed', color: 'gray' };
+            }
+            
+            if (wait.wait === 0) {
+                return { text: 'No Wait', color: 'green' };
+            }
+            
+            let color = 'green';
+            if (wait.wait > 60) color = 'red';
+            else if (wait.wait > 30) color = 'yellow';
+            
+            return { text: `${wait.wait} min`, color };
+        }
+
+        // Render functions
+        function renderFilterChips() {
+            const container = document.getElementById('filterChips');
+            const lands = ['All', ...new Set(ATTRACTIONS.map(a => a.land))];
+            
+            container.innerHTML = lands.map(land => {
+                const value = land.toLowerCase().replace(/\s+/g, '-');
+                const isActive = (value === 'all' && currentFilter === 'all') || 
+                                (value !== 'all' && currentFilter === land);
+                return `
+                    <button class="filter-chip ${isActive ? 'active' : ''}" 
+                            onclick="setFilter('${value === 'all' ? 'all' : land}')">
+                        ${land}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            renderFilterChips();
+            renderRides();
+        }
+
+        function renderRides() {
+            const container = document.getElementById('ridesContainer');
+            const filtered = currentFilter === 'all' 
+                ? ATTRACTIONS 
+                : ATTRACTIONS.filter(a => a.land === currentFilter);
+            
+            container.innerHTML = filtered.map(attraction => {
+                const isCompleted = completedRides.has(attraction.id);
+                const wait = getWaitTimeDisplay(attraction.id);
+                
+                return `
+                    <div class="ride-card ${isCompleted ? 'completed' : ''} ${attraction.headliner ? 'headliner' : ''}"
+                         onclick="toggleRide('${attraction.id}')">
+                        <div class="ride-header">
+                            <div class="ride-name">
+                                ${attraction.name}
+                                ${attraction.headliner ? '<span class="headliner-badge">Headliner</span>' : ''}
+                            </div>
+                        </div>
+                        <div class="ride-land">${attraction.land}</div>
+                        <div class="ride-wait">
+                            <div class="wait-dot ${wait.color}"></div>
+                            ${wait.text}
+                        </div>
+                        <div class="ride-notes">${attraction.notes}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('checklist');
+            container.innerHTML = ATTRACTIONS.map(attraction => {
+                const isCompleted = completedRides.has(attraction.id);
+                const wait = getWaitTimeDisplay(attraction.id);
+                
+                return `
+                    <div class="checklist-item ${isCompleted ? 'completed' : ''}"
+                         onclick="toggleRide('${attraction.id}')">
+                        <div class="checklist-checkbox ${isCompleted ? 'checked' : ''}"></div>
+                        <div class="checklist-name">${attraction.name}</div>
+                        <div class="checklist-wait" style="color: var(--${wait.color === 'gray' ? 'closed-gray' : wait.color === 'green' ? 'success-green' : wait.color === 'yellow' ? 'warning-yellow' : 'danger-red'})">
+                            ${wait.text}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderParkMap() {
+            const container = document.getElementById('parkMap');
+            const lands = [...new Set(ATTRACTIONS.map(a => a.land))];
+            
+            container.innerHTML = lands.map(land => {
+                const landAttractions = ATTRACTIONS.filter(a => a.land === land);
+                const completed = landAttractions.filter(a => completedRides.has(a.id)).length;
+                const total = landAttractions.length;
+                
+                // Calculate average wait time
+                const openRides = landAttractions.filter(a => {
+                    const wait = waitTimes[a.id];
+                    return wait && wait.status === 'open';
+                });
+                
+                const avgWait = openRides.length > 0
+                    ? Math.round(openRides.reduce((sum, a) => sum + (waitTimes[a.id]?.wait || 0), 0) / openRides.length)
+                    : 0;
+                
+                return `
+                    <div class="land-summary">
+                        <div class="land-summary-name">${land}</div>
+                        <div class="land-summary-stats">
+                            <span>${completed}/${total} rides</span>
+                            <span>${avgWait > 0 ? `${avgWait} min avg` : 'N/A'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderSuggestedRides() {
+            const container = document.getElementById('suggestedRides');
+            const incomplete = ATTRACTIONS.filter(a => !completedRides.has(a.id));
+            
+            if (incomplete.length === 0) {
+                container.innerHTML = '<li class="suggested-ride"><div class="suggested-ride-name">All rides completed! 🎉</div></li>';
+                return;
+            }
+            
+            // Sort by: 1) shortest wait, 2) highest priority (lower number), 3) name
+            const sorted = incomplete.sort((a, b) => {
+                const waitA = waitTimes[a.id]?.wait || 999;
+                const waitB = waitTimes[b.id]?.wait || 999;
+                const statusA = waitTimes[a.id]?.status || 'closed';
+                const statusB = waitTimes[b.id]?.status || 'closed';
+                
+                // Closed rides go to the end
+                if (statusA === 'closed' && statusB !== 'closed') return 1;
+                if (statusA !== 'closed' && statusB === 'closed') return -1;
+                
+                // Sort by wait time
+                if (waitA !== waitB) return waitA - waitB;
+                
+                // Sort by priority
+                if (a.priority !== b.priority) return a.priority - b.priority;
+                
+                // Sort by name
+                return a.name.localeCompare(b.name);
+            });
+            
+            const suggestions = sorted.slice(0, 4);
+            
+            container.innerHTML = suggestions.map(attraction => {
+                const wait = getWaitTimeDisplay(attraction.id);
+                return `
+                    <li class="suggested-ride" onclick="toggleRide('${attraction.id}')">
+                        <div class="suggested-ride-name">${attraction.name}</div>
+                        <div class="suggested-ride-info">
+                            ${wait.text} • ${attraction.land}
+                        </div>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        function updateProgress() {
+            const completed = completedRides.size;
+            const total = ATTRACTIONS.length;
+            const percentage = (completed / total) * 100;
+            
+            document.getElementById('progressText').textContent = `${completed}/${total}`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+        }
+
+        // Toggle ride completion
+        function toggleRide(attractionId) {
+            if (completedRides.has(attractionId)) {
+                completedRides.delete(attractionId);
+            } else {
+                completedRides.add(attractionId);
+            }
+            
+            saveCompletedRides();
+            updateProgress();
+            renderRides();
+            renderChecklist();
+            renderParkMap();
+            renderSuggestedRides();
+        }
+
+        // Reset functionality
+        function showResetModal() {
+            document.getElementById('resetModal').classList.add('show');
+        }
+
+        function hideResetModal() {
+            document.getElementById('resetModal').classList.remove('show');
+        }
+
+        function confirmReset() {
+            completedRides.clear();
+            saveCompletedRides();
+            updateProgress();
+            renderRides();
+            renderChecklist();
+            renderParkMap();
+            renderSuggestedRides();
+            hideResetModal();
+        }
+
+        // Initialize app on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
