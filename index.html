@@ -35,13 +35,14 @@
     .app-shell {
       max-width: 1200px;
       width: 100%;
+      margin: 0 auto;
       background: linear-gradient(145deg, rgba(15,23,42,0.98), rgba(15,23,42,0.9));
       border-radius: 18px;
       border: 1px solid rgba(148,163,184,0.35);
       box-shadow:
         0 20px 60px rgba(15,23,42,0.9),
         0 0 0 1px rgba(15,23,42,0.9);
-      overflow: hidden;
+      overflow: visible;
       display: flex;
       flex-direction: column;
     }
@@ -265,7 +266,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      overflow-y: auto;
+      overflow-y: visible;
       padding-right: 4px;
     }
 
@@ -583,7 +584,6 @@
     @media (max-width: 900px) {
       .app-shell {
         border-radius: 0;
-        height: 100vh;
       }
 
       body {
@@ -621,6 +621,10 @@
 
       .rides-grid {
         grid-template-columns: minmax(0, 1fr);
+      }
+
+      .app-shell {
+        border-radius: 0;
       }
     }
   </style>
@@ -702,160 +706,30 @@
 </div>
 
 <script>
-  // Core configuration
   const LOCAL_STORAGE_KEY = "dcaPlannerCompletedV1";
 
-  // IMPORTANT:
-  // You must set this to the Queue Times park ID for Disney California Adventure.
-  // Use https://queue-times.com/parks.json (or documentation) to find the DCA ID.[web:88][web:89]
-  const QUEUE_TIMES_PARK_ID = 17; // <-- replace if this is not DCA
+  // DCA is park 17 on Queue Times. [web:3][web:154]
+  const QUEUE_TIMES_PARK_ID = 17;
 
-  // Attractions list (curated must-dos)
   const ATTRACTIONS = [
-    // Avengers Campus
-    {
-      id: "guardians",
-      name: "Guardians of the Galaxy – Mission: Breakout!",
-      land: "Avengers Campus",
-      headliner: true,
-      priority: 1,
-      notes: "Intense drop tower; great to hit early or late.",
-    },
-    {
-      id: "webslingers",
-      name: "WEB SLINGERS: A Spider-Man Adventure",
-      land: "Avengers Campus",
-      headliner: true,
-      priority: 2,
-      notes: "Interactive shooter; can build long lines.",
-    },
-
-    // Cars Land
-    {
-      id: "rsr",
-      name: "Radiator Springs Racers",
-      land: "Cars Land",
-      headliner: true,
-      priority: 0,
-      notes: "Top priority; best early morning, single rider, or late night.[web:30]",
-    },
-    {
-      id: "maters",
-      name: "Mater’s Junkyard Jamboree",
-      land: "Cars Land",
-      headliner: false,
-      priority: 7,
-      notes: "Good family ride; flexible timing.",
-    },
-    {
-      id: "luigis",
-      name: "Luigi’s Rollickin’ Roadsters",
-      land: "Cars Land",
-      headliner: false,
-      priority: 8,
-      notes: "Short ride; nice if nearby.",
-    },
-
-    // Pixar Pier
-    {
-      id: "incredicoaster",
-      name: "Incredicoaster",
-      land: "Pixar Pier",
-      headliner: true,
-      priority: 3,
-      notes: "Major coaster; can be cooler and more comfortable at night.[web:86]",
-    },
-    {
-      id: "tsmm",
-      name: "Toy Story Midway Mania!",
-      land: "Pixar Pier",
-      headliner: true,
-      priority: 4,
-      notes: "Fun shooter; queue is mostly indoors.",
-    },
-    {
-      id: "pixarpal",
-      name: "Pixar Pal-A-Round (Non-Swinging)",
-      land: "Pixar Pier",
-      headliner: false,
-      priority: 10,
-      notes: "Great views if you like heights.",
-    },
-    {
-      id: "insideout",
-      name: "Inside Out Emotional Whirlwind",
-      land: "Pixar Pier",
-      headliner: false,
-      priority: 12,
-      notes: "Nice filler ride if wait is short.",
-    },
-
-    // Paradise Gardens Park
-    {
-      id: "mermaid",
-      name: "The Little Mermaid ~ Ariel’s Undersea Adventure",
-      land: "Paradise Gardens Park",
-      headliner: false,
-      priority: 6,
-      notes: "Usually moderate waits; air-conditioned.[web:90]",
-    },
-    {
-      id: "goofys",
-      name: "Goofy’s Sky School",
-      land: "Paradise Gardens Park",
-      headliner: false,
-      priority: 5,
-      notes: "Can be a bit rough; good if line is short.",
-    },
-    {
-      id: "sillysymphony",
-      name: "Silly Symphony Swings",
-      land: "Paradise Gardens Park",
-      headliner: false,
-      priority: 11,
-      notes: "Weather sensitive; can close for wind.[web:90]",
-    },
-
-    // Grizzly Peak
-    {
-      id: "grizzly",
-      name: "Grizzly River Run",
-      land: "Grizzly Peak",
-      headliner: true,
-      priority: 9,
-      notes: "You will get wet; better when it’s warm.[web:90]",
-    },
-    {
-      id: "soarin",
-      name: "Soarin’ Around the World",
-      land: "Grizzly Peak",
-      headliner: true,
-      priority: 2,
-      notes: "Classic headliner with great capacity; aim earlier in the day.[web:27]",
-    },
-
-    // Hollywood Land (select)
-    {
-      id: "monsters",
-      name: "Monsters, Inc. Mike & Sulley to the Rescue!",
-      land: "Hollywood Land",
-      headliner: false,
-      priority: 6,
-      notes: "Good family dark ride; can spike later in the day.[web:87]",
-    },
-
-    // Buena Vista / Entry
-    {
-      id: "redcar",
-      name: "Red Car Trolley",
-      land: "Buena Vista Street",
-      headliner: false,
-      priority: 13,
-      notes: "More of a transport/atmosphere attraction.[web:90]",
-    }
+    { id: "guardians", name: "Guardians of the Galaxy – Mission: Breakout!", land: "Avengers Campus", headliner: true, priority: 1, notes: "Intense drop tower; great to hit early or late." },
+    { id: "webslingers", name: "WEB SLINGERS: A Spider-Man Adventure", land: "Avengers Campus", headliner: true, priority: 2, notes: "Interactive shooter; can build long lines." },
+    { id: "rsr", name: "Radiator Springs Racers", land: "Cars Land", headliner: true, priority: 0, notes: "Top priority; best early morning, single rider, or late night." },
+    { id: "maters", name: "Mater’s Junkyard Jamboree", land: "Cars Land", headliner: false, priority: 7, notes: "Good family ride; flexible timing." },
+    { id: "luigis", name: "Luigi’s Rollickin’ Roadsters", land: "Cars Land", headliner: false, priority: 8, notes: "Short ride; nice if nearby." },
+    { id: "incredicoaster", name: "Incredicoaster", land: "Pixar Pier", headliner: true, priority: 3, notes: "Major coaster; can be cooler at night." },
+    { id: "tsmm", name: "Toy Story Midway Mania!", land: "Pixar Pier", headliner: true, priority: 4, notes: "Fun shooter; queue is mostly indoors." },
+    { id: "pixarpal", name: "Pixar Pal-A-Round (Non-Swinging)", land: "Pixar Pier", headliner: false, priority: 10, notes: "Great views if you like heights." },
+    { id: "insideout", name: "Inside Out Emotional Whirlwind", land: "Pixar Pier", headliner: false, priority: 12, notes: "Nice filler ride if wait is short." },
+    { id: "mermaid", name: "The Little Mermaid ~ Ariel’s Undersea Adventure", land: "Paradise Gardens Park", headliner: false, priority: 6, notes: "Usually moderate waits; air-conditioned." },
+    { id: "goofys", name: "Goofy’s Sky School", land: "Paradise Gardens Park", headliner: false, priority: 5, notes: "Can be a bit rough; good if line is short." },
+    { id: "sillysymphony", name: "Silly Symphony Swings", land: "Paradise Gardens Park", headliner: false, priority: 11, notes: "Weather sensitive; can close for wind." },
+    { id: "grizzly", name: "Grizzly River Run", land: "Grizzly Peak", headliner: true, priority: 9, notes: "You will get wet; better when it’s warm." },
+    { id: "soarin", name: "Soarin’ Around the World", land: "Grizzly Peak", headliner: true, priority: 2, notes: "Classic with great capacity; aim earlier in the day." },
+    { id: "monsters", name: "Monsters, Inc. Mike & Sulley to the Rescue!", land: "Hollywood Land", headliner: false, priority: 6, notes: "Good family dark ride; can spike later." },
+    { id: "redcar", name: "Red Car Trolley", land: "Buena Vista Street", headliner: false, priority: 13, notes: "More of an atmosphere/transport attraction." }
   ];
 
-  // State
   let completed = new Set();
   let currentLandFilter = "All";
   let latestWaits = null;
@@ -865,9 +739,7 @@
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (stored) {
         const arr = JSON.parse(stored);
-        if (Array.isArray(arr)) {
-          completed = new Set(arr);
-        }
+        if (Array.isArray(arr)) completed = new Set(arr);
       }
     } catch (e) {
       console.warn("Failed to read local storage", e);
@@ -905,21 +777,23 @@
     if (!waits) return null;
     const nameNorm = attr.name.toLowerCase();
     let best = null;
+
     for (const land of waits.lands || []) {
       for (const ride of land.rides || []) {
         const rideName = (ride.name || "").toLowerCase();
-        if (rideName.includes(nameNorm) || nameNorm.includes(rideName)) {
+        if (rideName === nameNorm) {
           best = ride;
           break;
         }
       }
       if (best) break;
     }
+
     if (!best) {
       for (const land of waits.lands || []) {
         for (const ride of land.rides || []) {
           const rideName = (ride.name || "").toLowerCase();
-          if (nameNorm.split(" ")[0] && rideName.includes(nameNorm.split(" ")[0])) {
+          if (rideName.includes(nameNorm) || nameNorm.includes(rideName)) {
             best = ride;
             break;
           }
@@ -927,6 +801,7 @@
         if (best) break;
       }
     }
+
     if (!best) return null;
     if (best.is_open === false) return { wait: null, status: "closed" };
     if (best.wait_time === 0 && best.is_open === true) return { wait: 0, status: "open" };
