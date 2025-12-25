@@ -114,8 +114,7 @@
 
     main {
       display: flex;
-      flex: 1;
-      min-height: 0;
+      align-items: stretch;
     }
 
     .sidebar {
@@ -591,7 +590,7 @@
       }
 
       main {
-        flex-direction: column;
+        display: block;
       }
 
       .sidebar {
@@ -707,9 +706,7 @@
 
 <script>
   const LOCAL_STORAGE_KEY = "dcaPlannerCompletedV1";
-
-  // DCA is park 17 on Queue Times. [web:3][web:154]
-  const QUEUE_TIMES_PARK_ID = 17;
+  const QUEUE_TIMES_PARK_ID = 17; // DCA on Queue Times[web:3][web:154]
 
   const ATTRACTIONS = [
     { id: "guardians", name: "Guardians of the Galaxy – Mission: Breakout!", land: "Avengers Campus", headliner: true, priority: 1, notes: "Intense drop tower; great to hit early or late." },
